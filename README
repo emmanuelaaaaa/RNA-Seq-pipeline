@@ -1,0 +1,2 @@
+These are the files for the RNA-Seq pipeline. They include 4 steps: mapping, filtering, rnaseqc and feature counting.
+Mapping is done with STAR  with the default arguments. The directory of the fastq files and the build are necessary arguments.

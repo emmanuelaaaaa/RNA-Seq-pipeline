@@ -128,6 +128,7 @@ for file in os.listdir('.'):
 
 main_command='module load picard-tools/1.105 \n' \
         + 'module load samtools/0.1.19 \n' \
+        + 'module unload java \n' \
         + 'module load java/7u80 \n' \
         + '#RNA-SeQC v1.1.8.1 07/11/14 \n' \
 

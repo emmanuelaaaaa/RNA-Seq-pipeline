@@ -45,7 +45,7 @@ else:
         aligned_dir= main_dir + 'tophat_links/'
     else:
         aligned_dir= mapping_dir
-    filtered_bams_dir = mapping_dir + 'filtered_bams_bigwigs/'
+    filtered_bams_dir = main_dir + 'bamfiles_bigwigs/filtered_bams_bigwigs/'
 
 pairedorsingle=args.s
 mapper=args.map 
@@ -63,6 +63,9 @@ if not os.path.exists(mapping_dir):
 
 if not os.path.exists(aligned_dir):
     os.makedirs(aligned_dir)
+
+if not os.path.exists(main_dir + 'bamfiles_bigwigs/'):
+    os.makedirs(main_dir + 'bamfiles_bigwigs/')
 
 if not os.path.exists(filtered_bams_dir):
     os.makedirs(filtered_bams_dir)
@@ -121,9 +124,13 @@ for bam in my_aligned:
         
     if rmdup==True:
         if rmmultimap==True:
-            command_rmdup='samtools rmdup ' + rmdupflag + filtered_bams_dir + bam + multimapbam  + ' ' + filtered_bams_dir + bam + '_final_filtered.bam \n'
+            command_rmdup='samtools sort ' + filtered_bams_dir + bam + multimapbam  + ' ' + filtered_bams_dir + bam + '_sorted_filtered\n' \
+            + 'samtools rmdup ' + rmdupflag + filtered_bams_dir + bam + '_sorted_filtered.bam'  + ' ' + filtered_bams_dir + bam + '_final_filtered.bam \n'
+            + 'rm ' + filtered_bams_dir + bam + '_sorted_filtered.bam \n'
         else:
-            command_rmdup='samtools rmdup ' + rmdupflag + aligned_dir + bam + multimapbam  + ' ' + filtered_bams_dir + bam + '_final_filtered.bam \n'
+            command_rmdup='samtools sort ' + aligned_dir + bam + multimapbam  + ' ' + filtered_bams_dir + bam + '_sorted_filtered\n' \
+            + 'samtools rmdup ' + rmdupflag + filtered_bams_dir + bam + '_sorted_filtered.bam'  + ' ' + filtered_bams_dir + bam + '_final_filtered.bam \n' \
+            + 'rm ' + filtered_bams_dir + bam + '_sorted_filtered.bam \n'
     else:
         command_rmdup=''
     command=command_part1 + command_rmmultimap + command_rmdup + rmthemultimap

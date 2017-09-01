@@ -27,9 +27,12 @@ parser.add_argument('-useENCODEflags', action='store_true', help='Flag for using
 parser.add_argument('-ERCC',  action='store_true', help='Flag for specifying mapping with the ERCC, when the ERCC spike-ins were included in the samples.')
 parser.add_argument('-adapterseq', help='Provide the sequence to be used for clipping with STAR  (using the clip3pAdapterSeq flag).')
 
-# have changed
 parser.add_argument('-fastqc', action='store_true', help='Flag for running fastqc')
 parser.add_argument('-doonlyfastqc', action='store_true', help='Flag for sending the scripts for fastqc only and exiting without doing the mapping.')
+
+# have changed
+parser.add_argument('-fastqscreen', action='store_true', help='Flag for running fastq_screen')
+parser.add_argument('-doonlyfastqscreen', action='store_true', help='Flag for sending the scripts for fastq_screen only and exiting without doing the mapping or the fastqc.')
 
 args = parser.parse_args()
 
@@ -51,6 +54,8 @@ useENCODEflags=args.useENCODEflags
 ercc=args.ERCC
 runfastqc=args.fastqc
 runonlyfastqc=args.doonlyfastqc
+runfastqscreen=args.fastqscreen
+runonlyfastqscreen=args.doonlyfastqscreen
 
 ##########################
 ### setting up the directories
@@ -66,6 +71,7 @@ else:
   
 log_dir = main_dir + 'logs/'
 fastqc_dir= main_dir + 'fastqc/'
+fastqscreen_dir= main_dir + 'fastq_screen/'
 
 if args.map=='tophat':
     mapping_dir= main_dir + 'tophat_aligned/'
@@ -79,8 +85,11 @@ else:
 if not os.path.exists(log_dir):
     os.makedirs(log_dir)
 
-if runfastqc and not os.path.exists(fastqc_dir):
+if (runfastqc or runonlyfastqc) and not os.path.exists(fastqc_dir):
     os.makedirs(fastqc_dir)
+
+if (runfastqscreen or runonlyfastqscreen) and not os.path.exists(fastqscreen_dir):
+    os.makedirs(fastqscreen_dir)
 
 if not os.path.exists(mapping_dir):
     os.makedirs(mapping_dir)
@@ -243,15 +252,15 @@ if ((not any(all_samplepattern1)) and (not any(all_samplepattern2)) and (not sin
     sys.exit()
 
 ############################
-### PART1: run fastqc
+### PART1: run fastqc and fastq_screen
 
 if NextSeq:
     temp_dir = main_dir + 'temp/'
     if not os.path.exists(temp_dir):
         os.makedirs(temp_dir)
 
-if runfastqc:
-    main_command_fastqc='module load fastqc/0.11.4 \n' \
+if runfastqc or runonlyfastqc or runfastqscreen or runonlyfastqscreen:
+    main_command_fastqcommands='module purge \n' + 'module load fastq_screen \n' + 'module load fastqc/0.11.4 \n' \
        
     for i in range(1,toprange+1):
         for filename in uniqsamples[(i-1)*20:i*20]:
@@ -283,18 +292,35 @@ if runfastqc:
                     mergedfiles2 = foundfiles[1]
                     extra_command = ''
                     extra_command2 = ''
-            if singleend:
-                command_fastqc=extra_command + 'fastqc ' + mergedfiles + ' -o ' + fastqc_dir +' --extract \n' + extra_command2
-            else:
-                command_fastqc=extra_command + 'fastqc ' + mergedfiles1 + ' -o ' + fastqc_dir +' --extract \n' + 'fastqc ' + mergedfiles2 + ' -o ' + fastqc_dir +' --extract \n' + extra_command2
+            if runfastqc or runonlyfastqc:
+                if singleend:
+                    command_fastqc=extra_command + 'fastqc ' + mergedfiles + ' -o ' + fastqc_dir +' --extract \n' + extra_command2
+                else:
+                    command_fastqc=extra_command + 'fastqc ' + mergedfiles1 + ' -o ' + fastqc_dir +' --extract \n' + 'fastqc ' + mergedfiles2 + ' -o ' + fastqc_dir +' --extract \n' + extra_command2
+                main_command_fastqcommands = main_command_fastqcommands + command_fastqc
 
-            main_command_fastqc = main_command_fastqc + command_fastqc
-        submit_qsub_jobs(main_command_fastqc, nameqsub='qsubjob_fastqc_' + str(i), my_dir=log_dir, namejob='fastqc_' + str(i), logfile= 'fastqc_batch' + str(i) + 'output.$JOB_ID', errfile= 'fastqc_batch' + str(i) + 'error.$JOB_ID', user=user)        
+            if runfastqscreen or runonlyfastqscreen:
+                if singleend:
+                    command_fastqscreen=extra_command + 'fastq_screen --aligner bowtie2 ' + mergedfiles + ' --outdir ' + fastqscreen_dir + ' \n' + extra_command2
+                else:
+                    command_fastqscreen=extra_command + 'fastq_screen --aligner bowtie2 ' + mergedfiles1 + ' --outdir ' + fastqscreen_dir +' \n' + extra_command2
+                main_command_fastqcommands = main_command_fastqcommands + command_fastqscreen
+
+            if runfastqc and runfastqscreen:
+                if singleend:
+                    command_fastqc=extra_command + 'fastqc ' + mergedfiles + ' -o ' + fastqc_dir +' --extract \n'
+                    command_fastqscreen='fastq_screen --aligner bowtie2 ' + mergedfiles + ' --outdir ' + fastqscreen_dir + ' \n' + extra_command2
+                else:
+                    command_fastqc=extra_command + 'fastqc ' + mergedfiles1 + ' -o ' + fastqc_dir +' --extract \n' + 'fastqc ' + mergedfiles2 + ' -o ' + fastqc_dir +' --extract \n' 
+                    command_fastqscreen='fastq_screen --aligner bowtie2 ' + mergedfiles1 + ' --outdir ' + fastqscreen_dir + ' \n' + extra_command2
+                main_command_fastqcommands = main_command_fastqcommands + command_fastqc +  command_fastqscreen
+
+        submit_qsub_jobs(main_command_fastqcommands, nameqsub='qsubjob_fastq_' + str(i), my_dir=log_dir, namejob='fastq_' + str(i), logfile= 'fastq_batch' + str(i) + 'output.$JOB_ID', errfile= 'fastq_batch' + str(i) + 'error.$JOB_ID', user=user)        
         #print main_command_fastqc
-        main_command_fastqc='module load fastqc/0.11.4 \n' \
+        main_command_fastqcommands='module purge \n' + 'module load fastq_screen \n' + 'module load fastqc/0.11.4 \n' \
 
-if runonlyfastqc:
-    print 'The fastqc qsub file(s) been sent. It will now exit because you have added the -doonlyfastqc flag. '
+if runonlyfastqc or runonlyfastqscreen:
+    print 'The fastqc or fastq_screen qsub file(s) been sent. It will now exit because you have added the -doonlyfastqc/doonlyfastqscreen flag. '
     sys.exit()
 
 ##########################

@@ -11,7 +11,7 @@ parser = argparse.ArgumentParser(description='This script will provide the count
 
 parser.add_argument('-o', help='Required. Provide the root directory of the project where the files with the output will be created.', required=True)
 parser.add_argument('-build', choices=['hg38', 'hg19', 'hg18', 'dm3', 'mm9','mm10'], help='Required. Build to be used.', required=True)
-parser.add_argument('-filtereddir', help='Provide the directory where the (filtered) bams are in. If not specified, the files are expected to be in bamfiles/filtered_bams_bigwigs')
+parser.add_argument('-filtereddir', help='Provide the directory where the (filtered) bams are in. If not specified, the files are expected to be in bamfiles_bigwigs/filtered_bams_bigwigs')
 parser.add_argument('-s', action='store_const', default='paired', const='single', help='Flag for single-end data.')
 parser.add_argument('-stranded', choices=['yes', 'no', 'reverse'], default='no', help='Is the sequencing stranded (yes/no/reverse). By default no.')
 parser.add_argument('-t', default='5', help='Number of threads. 5 by default.')
@@ -41,7 +41,7 @@ elif args.build=='dm3':
 log_dir = main_dir + 'logs/'
 
 if args.filtereddir==None:
-    filtered_bams_dir = main_dir + 'bamfiles/filtered_bams_bigwigs/'
+    filtered_bams_dir = main_dir + 'bamfiles_bigwigs/filtered_bams_bigwigs/'
 else:
     filtered_bams_dir= args.filtereddir
     if not filtered_bams_dir.endswith('/'):

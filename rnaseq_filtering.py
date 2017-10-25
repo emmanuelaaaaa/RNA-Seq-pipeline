@@ -12,7 +12,7 @@ parser = argparse.ArgumentParser(description='This script will filter the mapped
 parser.add_argument('-o', help='Required. Provide the root directory of the project where the files with the output will be created.', required=True)
 parser.add_argument('-map', choices=['star', 'tophat'], help='Required. Aligner used for the mapping (tophat files are expected to be named "accepted_hits.bam" and for star to have the Aligned.sortedByCoord.out.bam suffix - otherwise it needs to be set).', required=True)
 parser.add_argument('-mapdir', help='Provide the directory where the mapped files are in. If not specified, the directory is expected to be called star_aligned or tophat_aligned under the root directory specified above.')
-parser.add_argument('-suffixbam', default= 'Aligned.sortedByCoord.out.bam', help='Suffix of mapped files (to be removed). Tophat files are expected to be named "accepted_hits.bam" and for star to have the "Aligned.sortedByCoord.out.bam" suffix). Otherwise it needs to be specified. (Default is "Aligned.sortedByCoord.out.bam")')
+parser.add_argument('-suffixbam', default= 'Aligned.out.bam', help='Suffix of mapped files (to be removed). Tophat files are expected to be named "accepted_hits.bam" and for star to have the "Aligned.out.bam" suffix). Otherwise it needs to be specified. (Default is "Aligned.out.bam")')
 parser.add_argument('-s', action='store_const', default='paired', const='single', help='Flag for single-end data.')
 parser.add_argument('-rmdup', action='store_const', default=False, const=True, help='Remove PCR duplicates (True/False). By default False.')
 parser.add_argument('-rmmultimap', action='store_const', default=False, const=True, help='Remove multimapping (True/False). By default False.')

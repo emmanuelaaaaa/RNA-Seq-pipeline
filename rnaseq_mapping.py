@@ -140,7 +140,7 @@ elif args.build=='dm3':
 if ercc:
     gtf_file = gtf_file_ERCC
     star_genome_dir = star_genome_dir_ERCC
-    if gtf_file=='' or star_genome_dir:
+    if gtf_file=='' or star_genome_dir=='':
         print 'The genome files for with the ERCC are missing for this genome. Update the genomes and then update the pipeline.'
         sys.exit()
 
@@ -313,10 +313,10 @@ if runfastqc or runonlyfastqc or runfastqscreen or runonlyfastqscreen:
                 else:
                     command_fastqc=extra_command + 'fastqc ' + mergedfiles1 + ' -o ' + fastqc_dir +' --extract \n' + 'fastqc ' + mergedfiles2 + ' -o ' + fastqc_dir +' --extract \n' 
                     command_fastqscreen='fastq_screen --aligner bowtie2 ' + mergedfiles1 + ' --outdir ' + fastqscreen_dir + ' \n' + extra_command2
-                main_command_fastqcommands = main_command_fastqcommands + command_fastqc +  command_fastqscreen
+                main_command_fastqcommands='module purge \n' + 'module load fastq_screen \n' + 'module load fastqc/0.11.4 \n' + command_fastqc +  command_fastqscreen
 
-        submit_qsub_jobs(main_command_fastqcommands, nameqsub='qsubjob_fastq_' + str(i), my_dir=log_dir, namejob='fastq_' + str(i), logfile= 'fastq_batch' + str(i) + 'output.$JOB_ID', errfile= 'fastq_batch' + str(i) + 'error.$JOB_ID', user=user)        
-        #print main_command_fastqc
+        #submit_qsub_jobs(main_command_fastqcommands, nameqsub='qsubjob_fastq_' + str(i), my_dir=log_dir, namejob='fastq_' + str(i), logfile= 'fastq_batch' + str(i) + 'output.$JOB_ID', errfile= 'fastq_batch' + str(i) + 'error.$JOB_ID', user=user)        
+        print main_command_fastqcommands
         main_command_fastqcommands='module purge \n' + 'module load fastq_screen \n' + 'module load fastqc/0.11.4 \n' \
 
 if runonlyfastqc or runonlyfastqscreen:
@@ -397,6 +397,6 @@ else:
                 
         removegenome = 'STAR --genomeDir ' + star_genome_dir + ' --genomeLoad Remove \n'
         main_command_star = main_command_star + removegenome
-        submit_qsub_jobs(main_command_star, nameqsub='qsubjob_star_batch' + str(i), my_dir=log_dir, namejob='mapping_' + str(i), logfile= 'mapping_batch' + str(i) + 'output.$JOB_ID', errfile= 'mapping_batch' + str(i) + 'error.$JOB_ID', user=user)        
-        #print main_command_star
+        #submit_qsub_jobs(main_command_star, nameqsub='qsubjob_star_batch' + str(i), my_dir=log_dir, namejob='mapping_' + str(i), logfile= 'mapping_batch' + str(i) + 'output.$JOB_ID', errfile= 'mapping_batch' + str(i) + 'error.$JOB_ID', user=user)        
+        print main_command_star
         main_command_star='module load rna-star \n' \

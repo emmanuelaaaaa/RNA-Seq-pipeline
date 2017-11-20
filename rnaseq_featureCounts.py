@@ -14,6 +14,7 @@ parser.add_argument('-build', choices=['hg38', 'hg19', 'hg18', 'dm3', 'mm9','mm1
 parser.add_argument('-filtereddir', help='Provide the directory where the (filtered) bams are in. If not specified, the files are expected to be in bamfiles_bigwigs/filtered_bams_bigwigs')
 parser.add_argument('-s', action='store_const', default='paired', const='single', help='Flag for single-end data.')
 parser.add_argument('-stranded', choices=['yes', 'no', 'reverse'], default='no', help='Is the sequencing stranded (yes/no/reverse). By default no.')
+parser.add_argument('-ERCC',  action='store_true', help='Flag for specifying mapping with the ERCC, when the ERCC spike-ins were included in the samples.')
 parser.add_argument('-t', default='5', help='Number of threads. 5 by default.')
 parser.add_argument('-user', default='erepapi', help='User to whom the notifications will be sent (used when sending the jobs to the queue).')
 
@@ -24,19 +25,37 @@ args = parser.parse_args()
 main_dir=args.o
 if not main_dir.endswith('/'):
     main_dir=main_dir+'/'
-  
+
+pairedorsingle=args.s
+t=args.t
+isitstranded=args.stranded 
+ercc=args.ERCC
+user=args.user
+ 
 if args.build=='hg19':
     gtf_file='/databank/igenomes/Homo_sapiens/UCSC/hg19/Annotation/Genes/genes.gtf'
+    gtf_file_ERCC='/databank/igenomes/Homo_sapiens/UCSC/hg19/Annotation/Genes/genes_with_ERCC.gtf'
 elif args.build=='hg18':
     gtf_file='/databank/igenomes/Homo_sapiens/UCSC/hg18/Annotation/Genes/genes.gtf'
+    gtf_file_ERCC=''
 elif args.build=='hg38':
     gtf_file='/databank/igenomes/Homo_sapiens/UCSC/hg38/Annotation/Genes/genes.gtf'
+    gtf_file_ERCC='/databank/igenomes/Homo_sapiens/UCSC/hg38/Annotation/Genes/genes_with_ERCC.gtf'
 elif args.build=='mm9':
     gtf_file='/databank/igenomes/Mus_musculus/UCSC/mm9/Annotation/Genes/genes.gtf'
+    gtf_file_ERCC='/databank/igenomes/Mus_musculus/UCSC/mm9/Annotation/Genes/genes_with_ERCC.gtf'
 elif args.build=='mm10':
     gtf_file='/databank/igenomes/Mus_musculus/UCSC/mm10/Annotation/Genes/genes.gtf'
+    gtf_file_ERCC='/databank/igenomes/Mus_musculus/UCSC/mm10/Annotation/Genes/genes_with_ERCC.gtf'
 elif args.build=='dm3':
     gtf_file='/databank/igenomes/Drosophila_melanogaster/UCSC/dm3/Annotation/Genes/genes.gtf'
+    gtf_file_ERCC=''
+
+if ercc:
+    gtf_file = gtf_file_ERCC
+    if gtf_file=='':
+        print 'The genome files for with the ERCC are missing for this genome. Update the genomes and then update the pipeline.'
+        sys.exit()
 
 log_dir = main_dir + 'logs/'
 
@@ -46,11 +65,6 @@ else:
     filtered_bams_dir= args.filtereddir
     if not filtered_bams_dir.endswith('/'):
         filtered_bams_dir=filtered_bams_dir+'/'
-
-pairedorsingle=args.s
-t=args.t
-isitstranded=args.stranded 
-user=args.user
 
 ##########################
 if not os.path.exists(log_dir):

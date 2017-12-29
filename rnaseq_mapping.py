@@ -209,8 +209,10 @@ listset = []
 for i in samplefiles:
     if NextSeq:
         listset.append(i[0:len(i)-len('_L001_R1_001.' + fastq_pattern)])
-    else:
+    elif i.endswith('_1.' + fastq_pattern):
         listset.append(i[0:len(i)-len('_1.' + fastq_pattern)])
+    else:
+        listset.append(i[0:len(i)-len('.' + fastq_pattern)])
 
 uniqsamples = list(set(listset)) # to get the unique samples for paired-end or Next-Seq 
 toprange = int(math.ceil(float(len(uniqsamples))/20)) # to get how many sets of 20 samples (the number of qsub to send)

@@ -219,6 +219,6 @@ for i in range(1,toprange+1):
             command_cutadapt=extra_command + 'cutadapt -m 10 ' + adapterflag + qual_param + ' -o ' + outputfiles1 + ' -p ' + outputfiles2 + ' ' + mergedfiles1 + ' ' + mergedfiles2 + ' \n' + extra_command2
         main_command = main_command + command_cutadapt
 
-    #submit_qsub_jobs(main_command, nameqsub='qsubjob_trimming_' + str(i), my_dir=log_dir, namejob='cutadapt_' + str(i), logfile= 'cutadapt_batch' + str(i) + 'output.$JOB_ID', errfile= 'cutadapt_batch' + str(i) + 'error.$JOB_ID', user=user)        
-    print main_command
+    submit_qsub_jobs(main_command, nameqsub='qsubjob_trimming_' + str(i), my_dir=log_dir, namejob='cutadapt_' + str(i), logfile= 'cutadapt_batch' + str(i) + 'output.$JOB_ID', errfile= 'cutadapt_batch' + str(i) + 'error.$JOB_ID', user=user)        
+    #print main_command
     main_command='module load cutadapt/1.8.3 \n' \

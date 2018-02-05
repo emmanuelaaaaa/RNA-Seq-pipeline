@@ -1,4 +1,4 @@
-These are the files for the RNA-Seq pipeline. They include 4 steps: mapping, filtering, rnaseqc and feature counting.
+These are the files for the RNA-Seq pipeline. They include 5 steps: (trimming), mapping, (filtering, rnaseqc) and feature counting.
 Mapping can be done with STAR (default) or with tophat. The top directory where the folders will be created and the build are necessary arguments. It works with files from the WT(_1.fastq) and from NextSeq (4 lanes of fastq). It can also run fastqc and fastqscreen with the same command.
 The trimming script will run cutadapt. The top directory where the folders will be created is a necessary argument. 
 The filtering script will filter the mapped files. The top directory where the folders will be created is necessary argument. It can remove multimapping reads and duplicates. 

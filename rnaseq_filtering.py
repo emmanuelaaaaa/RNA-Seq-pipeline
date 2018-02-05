@@ -125,7 +125,7 @@ for bam in my_aligned:
     if rmdup==True:
         if rmmultimap==True:
             command_rmdup='samtools sort ' + filtered_bams_dir + bam + multimapbam  + ' ' + filtered_bams_dir + bam + '_sorted_filtered\n' \
-            + 'samtools rmdup ' + rmdupflag + filtered_bams_dir + bam + '_sorted_filtered.bam'  + ' ' + filtered_bams_dir + bam + '_final_filtered.bam \n'
+            + 'samtools rmdup ' + rmdupflag + filtered_bams_dir + bam + '_sorted_filtered.bam'  + ' ' + filtered_bams_dir + bam + '_final_filtered.bam \n' \
             + 'rm ' + filtered_bams_dir + bam + '_sorted_filtered.bam \n'
         else:
             command_rmdup='samtools sort ' + aligned_dir + bam + multimapbam  + ' ' + filtered_bams_dir + bam + '_sorted_filtered\n' \

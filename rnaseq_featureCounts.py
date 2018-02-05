@@ -7,7 +7,7 @@ from subprocess import call
 from sending_qsubjobs import submit_qsub_jobs
 
 # at some point look at http://pymotw.com/2/optparse/index.html#module-optparse to organise the options
-parser = argparse.ArgumentParser(description='This script will provide the counts table to be used in the analysis. The main directory is necessary argument. The directory with the filtered data can be specified. If not, it is expected to be called filtered_bams (as the output of the rnaseq_filtering.py).')
+parser = argparse.ArgumentParser(description='This script will provide the counts table to be used in the analysis. The main directory and the build are necessary arguments. The directory with the input bam files can be specified. If not, it is expected to be called filtered_bams (as the output of the rnaseq_filtering.py).')
 
 parser.add_argument('-o', help='Required. Provide the root directory of the project where the files with the output will be created.', required=True)
 parser.add_argument('-build', choices=['hg38', 'hg19', 'hg18', 'dm3', 'mm9','mm10'], help='Required. Build to be used.', required=True)

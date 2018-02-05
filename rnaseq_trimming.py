@@ -7,7 +7,7 @@ from subprocess import call
 from sending_qsubjobs import submit_qsub_jobs
 
 # at some point look at http://pymotw.com/2/optparse/index.html#module-optparse to organise the options
-parser = argparse.ArgumentParser(description='This script will map the fastq files. The output directory and the build are necessary arguments. By default the directory with the fastq files is assumed to be a subfolder named "fastq_files" in the main directory. If it is different than that, it needs to be specified. It is recommended to have created a fastq directory (within the main directory) with symbolic links to the downloaded fastq files. Also it is easier if the names have been changed to a more informative name rather than the project number. If the files are paired-end the _1.fastq and _2.fastq suffixes (or _1/2.fastq.gz) are expected.')
+parser = argparse.ArgumentParser(description='This script will trim the fastq files with cutadapt. The output directory is the only necessary argument. By default the directory with the fastq files is assumed to be a subfolder named "fastq_files" in the main directory. If it is different than that, it needs to be specified. If the files are paired-end the _1.fastq and _2.fastq suffixes (or _1/2.fastq.gz) are expected.')
 
 parser.add_argument('-o', help='Required. Provide the root directory of the project where the files with the output will be created.', required=True)
 parser.add_argument('-fastq', help='Provide the directory where the fastq files are.')

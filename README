@@ -1,8 +1,41 @@
-These are the files for the RNA-Seq pipeline. They include 5 steps: (trimming), mapping, (filtering, rnaseqc) and feature counting.
+These are the files for the RNA-Seq pipeline. They include 5 steps: (trimming), mapping, (filtering, rnaseqc) and feature counting. For examples of getting the files from basespace see below. 
+
 Mapping can be done with STAR (default) or with tophat. The top directory where the folders will be created and the build are necessary arguments. It works with files from the WT(_1.fastq) and from NextSeq (4 lanes of fastq). It can also run fastqc and fastqscreen with the same command.
 The trimming script will run cutadapt. The top directory where the folders will be created is a necessary argument. 
 The filtering script will filter the mapped files. The top directory where the folders will be created is necessary argument. It can remove multimapping reads and duplicates. 
 The rnaseqc script will run RNASEQC. The top directory where the folders will be created is a necessary argument. 
-Teh featureCounts script will provide the counts table to be used in the analysis. The top directory where the folders will be created and the build are necessary arguments. 
+The featureCounts script will provide the counts table to be used in the analysis. The top directory where the folders will be created and the build are necessary arguments. 
 
 To get all the arguments and a description of each file type: python FILENAME.py -h
+
+An example of the pipeline, assuming that mymaindir is the parent directory where all the subfolders will be created:
+
+python /t1-data/user/erepapi/python/RNASeq_pipeline_git/rnaseq_mapping.py -o /mymaindir/ -build hg38 -fastq /mymaindir/fastq_files/ -usegtf -fastqc -fastqscreen -NextSeq -user erepapi
+python /t1-data/user/erepapi/python/RNASeq_pipeline_git/rnaseq_filtering.py -o /mymaindir/ -rmdup -rmmultimap -map star -mapdir /mymaindir/star_aligned/ -user erepapi
+python /t1-data/user/erepapi/python/RNASeq_pipeline_git/rnaseq_featureCounts.py -o /mymaindir/ -filtereddir /mymaindir/bamfiles_bigwigs/filtered_bams_bigwigs  -stranded reverse -build hg38 -user erepapi
+python /t1-data/user/erepapi/python/RNASeq_pipeline_git/rnaseq_rnaseqc.py -o /mymaindir/ -build hg38 -map star -mapdir /mymaindir/star_aligned/ -suffixbam Aligned.out.bam -user erepapi
+
+Keep in mind that there are a few flags for each script, especially for the mapping one that need to be set right! Have a look at all the options before running each step with python FILENAME.py -h
+
+Some extra commands for a complete project:
+
+Downloading the files from basespace:
+To get the Runs:
+cd /mymaindir/basespace_runs/
+cp -r /dir where basespace is mounted/BaseSpace/Runs/ProjectName/* .
+To get the fastq files:
+cd /mymaindir/fastq_files
+cp -r /dir where basespace is mounted/BaseSpace/Projects/ProjectName/Samples/* .
+
+Creating the bigwigs:
+cd /mymaindir/bamfiles_bigwigs/
+ln -s ../star_aligned/*Aligned.out.bam .
+module load ucsctools
+resample3.pl -rowsbasedonflagstat -totalmapped -indir "/mymaindir/bamfiles_bigwigs/" -outdir "/mymaindir/bamfiles_bigwigs/bigwigs" -build hg38 &> output.resample3 &
+
+Running multiqc:
+module unload python
+module load python/2.7.5
+module load multiqc/0.9
+cd /mymaindir/multiqc
+multiqc ../ -f --ignore *.resample3
